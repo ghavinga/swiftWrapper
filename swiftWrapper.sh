@@ -11,25 +11,40 @@
 
 function init()
 {
+	# Must pass on script parameters explicitly 
+	#
 	date=`date +%Y%m%d%H%M%S`
-	SS_AUTH_URL=$1
+	echo "Number of parms: $#"
+	SS_AUTH_ADDRESS=$1
+	METHOD="http://"
 	PORT=""
-	# PORT=":8080"
+	# export PORT=":8080"
 	AUTH="/auth/v1.0"
 	SS_AUTH_USER=$2
 	SS_AUTH_KEY=$3
 	SS_COMMAND=$4
+	SS_AUTH_URL=$METHOD$SS_AUTH_ADDRESS$PORT$AUTH
 
 }
 
 function checks()
 {
 	echo "Number of parms: $#"
-	if [ "$#" == "0" ]; then  
-		echo "Usage: $0 Swiftstack URL, account:user and key, [swift command]"
-		exit 1
+	if [ -z "$SS_AUTH_ADDRESS" ]; then 
+	       	SS_AUTH_ADDRESS="10.0.0.38"
+		SS_AUTH_URL=$METHOD$SS_AUTH_ADDRESS$PORT$AUTH
+		echo "No Swiftstack URL specified, substituting with $SS_AUTH_URL"
 	fi
-	ping -c 2 $1
+	if [ -z "$SS_AUTH_USER" ]; then
+		SS_AUTH_USER="dev:gerry"
+		echo "No swiftstack account:user specified, substituing with $SS_AUTH_USER"
+	fi
+	if [ -z "$SS_AUTH_KEY" ] ; then
+		SS_AUTH_KEY="password"
+		echo "No SwiftStack key / password specified, using default."
+	fi
+	echo "Checking network availability to Swiftstack API URL address:"
+	ping -c 2 $SS_AUTH_ADDRESS
 }
 
 function set_envs()
@@ -50,8 +65,9 @@ function list()
 	swift list
 }
 
-init
-checks
+init $1 $2 $3 $4
+checks  
 set_envs
-# stat
+stat
+list
 
