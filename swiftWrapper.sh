@@ -25,7 +25,7 @@ function init()
 function checks()
 {
 	echo "Number of parms: $#"
-	if [ $# == "0" ]; then  
+	if [ "$#" == "0" ]; then  
 		echo "Usage: $0 Swiftstack URL, account:user and key, [swift command]"
 		exit 1
 	fi
