@@ -24,7 +24,6 @@ function init()
 	SS_AUTH_KEY=$3
 	SS_COMMAND=$4
 	SS_AUTH_URL=$METHOD$SS_AUTH_ADDRESS$PORT$AUTH
-
 }
 
 function checks()
@@ -62,25 +61,58 @@ function stat()
 
 function list() 
 {
-	echo "Standard listin of account container:"
+	echo "Listin of account container for $SS_AUTH_USER:"
 	swift list
+}
+
+function multi_stat() 
+{
+	listArray=( $(swift list) )
+	# echo ${listArray[@]}
+	echo "Number of containers for this account: ${#listArray[*]}"
+	for (( i = 0 ; i < ${#listArray[*]} ; i++ ))
+	do
+	    echo "Content off: ${listArray[$i]}"
+	    swift stat ${listArray[$i]}
+	    echo "- - - - - - - - - - - - - - - - - - - - - "
+    	done
 }
 
 function multi_list() 
 {
 	listArray=( $(swift list) )
-	echo $listArray
-	echo "Number of containers for this account: ${#listArray0[*]}"
-	for (( i = 0 ; i < ${#listArray0[*]} ; i++ ))
+	# echo ${listArray[@]}
+	echo "Number of containers for this account: ${#listArray[*]}"
+	for (( i = 0 ; i < ${#listArray[*]} ; i++ ))
 	do
-	    echo "Element [$i]: ${listArray[$i]}"
+	    echo "Content off: ${listArray[$i]}"
+	    swift list ${listArray[$i]}
+	    echo "- - - - - - - - - - - - - - - - - - - - - "
     	done
 }
+
+function choose_command()
+{
+	echo "Possible swift commands: s - stat on root container, t - multiple (if available)"
+	echo "stat listing on each container found in root, l - listing on root container"
+	echo "m - multiple (if available) listing on each container found in root."
+	echo
+	read -p "What swift command would you like to execute [stlm]?" stlm
+	case $stlm in
+		[Ss]* ) stat; return;;
+		[Tt]* ) multi_stat; return;;
+		[Ll]* ) list; return;;
+		[Mm]* ) multi_list; return;;
+		* ) echo "Please answer s, t, l or m.";;
+	esac
+}
+
 
 init $1 $2 $3 $4
 checks  
 set_envs
-stat
-list
-multi_list
+# stat
+# list
+# multi_list
+choose_command
 
