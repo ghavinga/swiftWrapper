@@ -62,7 +62,19 @@ function stat()
 
 function list() 
 {
+	echo "Standard listin of account container:"
 	swift list
+}
+
+function multi_list() 
+{
+	listArray=( $(swift list) )
+	echo $listArray
+	echo "Number of containers for this account: ${#listArray0[*]}"
+	for (( i = 0 ; i < ${#listArray0[*]} ; i++ ))
+	do
+	    echo "Element [$i]: ${listArray[$i]}"
+    	done
 }
 
 init $1 $2 $3 $4
@@ -70,4 +82,5 @@ checks
 set_envs
 stat
 list
+multi_list
 
